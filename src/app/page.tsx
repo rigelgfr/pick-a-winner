@@ -1,7 +1,11 @@
+'use client'
+
+import ThemeButton from "@/components/ThemeButton";
+
 export default function Home() {
   return (
-    <>
-      <h1>Hello</h1>
-    </>
+    <div className="flex min-h-screen flex-col items-center justify-center">
+      <ThemeButton />
+    </div>
   );
 }
