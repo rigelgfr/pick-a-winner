@@ -1,4 +1,3 @@
-import Image from "next/image"
 import Link from "next/link"
 import { Facebook } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -12,7 +11,7 @@ export default function Home() {
           <Logo className="text-4xl"/>
         </span>
 
-        <p className="text-lg text-muted-foreground">
+        <p className="text-lg">
           pickAwinner utilizes Meta&apos;s Graph API to read comments from your Instagram giveaway post and draw random winners.
         </p>
 
@@ -26,7 +25,7 @@ export default function Home() {
         </div>
 
         <div className="pt-4">
-          <Button size="lg" className="rounded-full bg-facebook-blue hover:bg-facebook-blue/90 text-white">
+          <Button size="lg" className="rounded-full bg-facebook-blue hover:bg-facebook-blue/90 text-white shadow-lg">
             <Facebook className="h-5 w-5" />
             Log in with Facebook
           </Button>
