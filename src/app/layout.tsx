@@ -7,7 +7,7 @@ import { Header } from "@/components/header";
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "pickAwinner",
+  title: "Free giveaway picker | pickAwinner",
   description: "Easily pick random winners from your Instagram giveaway posts",
 };
 
@@ -28,7 +28,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Header />
-          <main className="pt-12">{children}</main>
+          <main className="min-h-screen pt-16">{children}</main>
         </ThemeProvider>
       </body>
     </html>
