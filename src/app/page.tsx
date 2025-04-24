@@ -1,36 +1,28 @@
-import Link from "next/link"
-import { Facebook } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import Logo from "@/components/logo"
+import { getUserData } from "@/features/picker/lib/user"
+import PickerPage from "@/features/picker/components/PickerPage";
+import LandingPage from "@/features/landing/components/LandingPage";
 
-export default function Home() {
+export default async function Home() {
+  const { user, error: serverError } = await getUserData();
+
+  if (serverError) {
+    console.error("Error loading user data for page:", serverError);
+    // Optionally render an error state or fall back to LandingPage
+    // For now, falling back to LandingPage if fetch fails
+  }
+
   return (
-    <div className="container flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] max-w-3xl mx-auto px-4 space-y-10">
-      <div className="text-center space-y-6">
-        <span className="flex items-center justify-center">
-          <Logo className="text-4xl"/>
-        </span>
+    <>
+      {/* <ErrorDisplay urlError={urlError} /> If needed and adapted */}
+      {serverError && <p style={{ color: 'red', textAlign: 'center' }}>Error checking login status: {serverError}</p>}
 
-        <p className="text-lg">
-          pickAwinner utilizes Meta&apos;s Graph API to read comments from your Instagram giveaway post and draw random winners.
-        </p>
-
-        <div className="pt-2">
-          <Link
-            href="/about"
-            className="text-sm text-primary underline underline-offset-4 hover:text-primary/80 transition-colors"
-          >
-            Learn how to set up your Facebook and Instagram accounts to use this app
-          </Link>
-        </div>
-
-        <div className="pt-4">
-          <Button size="lg" className="rounded-full bg-facebook-blue hover:bg-facebook-blue/90 text-white shadow-lg">
-            <Facebook className="h-5 w-5" />
-            Log in with Facebook
-          </Button>
-        </div>
-      </div>
-    </div>
+      {user ? (
+          // If user exists (logged in), show the Picker UI
+          <PickerPage user={user} />
+      ) : (
+          // If user is null (logged out or error fetching), show the Landing Page
+          <LandingPage />
+      )}
+    </>
   )
 }
