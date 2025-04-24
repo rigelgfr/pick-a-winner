@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Header } from "@/components/header";
+import { Header } from "@/components/Header";
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -28,7 +28,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Header />
-          <main className="min-h-screen pt-16">{children}</main>
+          <main className="min-h-screen pt-16 sm:px-6 2xl:px-[200px]">{children}</main>
         </ThemeProvider>
       </body>
     </html>
