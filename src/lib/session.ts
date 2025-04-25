@@ -32,7 +32,11 @@ export const sessionOptions: SessionOptions = {
 export interface UserProfile {
   id: string;
   username: string;
-  profile_picture_url?: string;
+  profile_picture_url?: string;name?: string; // Added: Full Name
+  biography?: string; // Added: Bio text
+  media_count?: number;
+  followers_count?: number; // Added
+  follows_count?: number; // Added
 }
 
 // --- Options for the temporary state cookie ---

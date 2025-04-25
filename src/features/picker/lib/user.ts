@@ -6,6 +6,11 @@ export interface InstagramUserResponse { // Keep this definition
     id: string;
     username: string;
     profile_picture_url?: string;
+    name?: string;
+    biography?: string;
+    media_count?: number;
+    followers_count?: number;
+    follows_count?: number;
     error?: { message: string };
 }
 
@@ -25,7 +30,7 @@ export async function getUserData(): Promise<{ user: UserProfile | null; error: 
   
     console.log(`getUserData: Attempting to fetch profile using /me endpoint`);
       try {
-          const fields = 'id,username,profile_picture_url'; // Let's try requesting profile pic again via /me
+          const fields = 'id,username,profile_picture_url,name,biography,media_count,followers_count,follows_count'; // Let's try requesting profile pic again via /me
           // const fields = 'id,username'; // Or stick to basic fields if profile_pic fails
   
           // --- MODIFIED URL: Use /me ---
@@ -60,6 +65,11 @@ export async function getUserData(): Promise<{ user: UserProfile | null; error: 
               id: String(userData.id), // ID comes from the /me response
               username: userData.username,
               profile_picture_url: userData.profile_picture_url,
+              name: userData.name, // Add name
+              biography: userData.biography, // Add biography
+              media_count: userData.media_count,
+              followers_count: userData.followers_count, // Add followers_count
+              follows_count: userData.follows_count, // Add follows_count
           };
           console.log("getUserData: Successfully fetched profile via /me. Returning user:", userProfile.username);
           return { user: userProfile, error: null };

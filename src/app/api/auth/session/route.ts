@@ -9,6 +9,11 @@ interface InstagramMeResponse {
     id: string;
     username: string;
     profile_picture_url?: string; // This is the field we need
+    name?: string; // Added
+    biography?: string; // Added
+    media_count?: number; // Added
+    followers_count?: number; // Added
+    follows_count?: number; // Added
     error?: { message: string };
 }
 
@@ -27,7 +32,7 @@ export async function GET() {
 
         // --- Fetch user profile from Instagram Graph API ---
         try {
-            const fields = 'id,username,profile_picture_url'; // Ensure profile_picture_url is requested
+            const fields = 'id,username,profile_picture_url,name,biography,media_count,followers_count,follows_count'; // Ensure profile_picture_url is requested
             const userApiUrl = `https://graph.instagram.com/me?fields=${fields}&access_token=${ig_access_token}`;
 
             const userResponse = await fetch(userApiUrl, { cache: 'no-store' }); // Don't cache heavily
@@ -55,6 +60,11 @@ export async function GET() {
                 id: String(userData.id), // Use the ID from /me
                 username: userData.username,
                 profile_picture_url: userData.profile_picture_url,
+                name: userData.name,
+                biography: userData.biography,
+                media_count: userData.media_count,
+                followers_count: userData.followers_count,
+                follows_count: userData.follows_count,
             };
 
             return NextResponse.json({ isLoggedIn: true, user: userProfile });
