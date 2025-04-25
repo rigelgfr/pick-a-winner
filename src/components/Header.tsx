@@ -99,7 +99,7 @@ export function Header() {
 
     return (
         <header className={`
-            w-full p-3 sm:px-6 2xl:px-[200px]
+            w-full p-3 sm:px-6 lg:px-[200px]
             flex justify-between items-center
             fixed top-0 left-0 right-0 z-50
             transition-all ease-in-out
