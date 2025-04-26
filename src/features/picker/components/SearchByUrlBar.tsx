@@ -1,83 +1,82 @@
-// components/SearchByUrl.tsx
-"use client";
-import React, { useState } from 'react';
+"use client"
+import type React from "react"
+import { useState } from "react"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Search } from "lucide-react"
 
-export interface FoundPost { // Define structure of what the search returns
-    id: string;
-    display_url?: string;
-    caption?: string;
-    timestamp: string;
-    like_count: number;
-    comments_count: number;
-    shortcode: string; // Good to have for reference
+export interface FoundPost {
+  id: string
+  display_url?: string
+  caption?: string
+  timestamp: string
+  like_count: number
+  comments_count: number
+  shortcode: string
 }
 
-// Props for the component
 interface SearchByUrlProps {
-    onPostFound: (postData: FoundPost | null) => void; // Callback with detailed data or null
-    onSearchStart: () => void; // Callback when search begins
-    onSearchEnd: (error?: string) => void; // Callback when search finishes (with optional error)
-    disabled?: boolean; // Allow parent to disable
+  onPostFound: (postData: FoundPost | null) => void
+  onSearchStart: () => void
+  onSearchEnd: (error?: string) => void
+  disabled?: boolean
 }
 
-const SearchByUrlBar: React.FC<SearchByUrlProps> = ({
-    onPostFound,
-    onSearchStart,
-    onSearchEnd,
-    disabled = false
-}) => {
-    const [url, setUrl] = useState('');
+const SearchByUrlBar: React.FC<SearchByUrlProps> = ({ onPostFound, onSearchStart, onSearchEnd, disabled = false }) => {
+  const [url, setUrl] = useState("")
 
-    const handleSearch = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!url.trim()) return;
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!url.trim()) return
 
-        onSearchStart(); // Notify parent that search is starting
-        onPostFound(null); // Clear previous results in parent
+    onSearchStart()
+    onPostFound(null)
 
-        try {
-            const response = await fetch(`/api/media/search?url=${encodeURIComponent(url)}`);
-            const data = await response.json();
+    try {
+      const response = await fetch(`/api/media/search?url=${encodeURIComponent(url)}`)
+      const data = await response.json()
 
-            if (!response.ok) {
-                throw new Error(data.error || `Search failed: ${response.statusText}`);
-            }
+      if (!response.ok) {
+        throw new Error(data.error || `Search failed: ${response.statusText}`)
+      }
 
-            if (data.post) {
-                onPostFound(data.post); // Pass full post data up
-                onSearchEnd(); // Notify search ended successfully
-            } else {
-                // Should not happen if API returns 404 correctly, but handle just in case
-                onSearchEnd('Post data not found in response.');
-            }
+      if (data.post) {
+        onPostFound(data.post)
+        onSearchEnd()
+      } else {
+        onSearchEnd("Post data not found in response.")
+      }
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Search failed."
+      console.error("Error searching by URL:", err)
+      onSearchEnd(errorMsg)
+    }
+  }
 
-        } catch (err) {
-             const errorMsg = err instanceof Error ? err.message : 'Search failed.';
-             console.error("Error searching by URL:", err);
-             onSearchEnd(errorMsg); // Notify search ended with error
-        }
-    };
+  return (
+    <div className="flex justify-center">
+        <form onSubmit={handleSearch} className="flex gap-2 w-[600px]">
+            <Input
+                type="url"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="Enter Instagram Post URL"
+                required
+                disabled={disabled}
+                className="flex-1 rounded-full"
 
-    return (
-        <div>
-            <h3>Find Post by URL</h3>
-            <form onSubmit={handleSearch}>
-                <input
-                    type="url"
-                    value={url}
-                    onChange={(e) => setUrl(e.target.value)}
-                    placeholder="Enter Instagram Post URL (e.g., https://www.instagram.com/p/...)"
-                    required
-                    style={{ width: '80%', marginRight: '10px', padding: '8px' }}
-                    disabled={disabled} // Use disabled prop
-                />
-                <button type="submit" disabled={disabled}> {/* Use disabled prop */}
-                     Search {/* Loading state is managed by parent now */}
-                </button>
-            </form>
-            {/* Error display is now handled by the parent component */}
-        </div>
-    );
-};
+            />
+            <Button type="submit" disabled={disabled} className="hidden sm:flex rounded-full text-foreground">
+                <Search className="h-4 w-4" />
+                Search
+            </Button>
+            <Button type="submit" disabled={disabled} className="sm:hidden rounded-full text-foreground">
+                <Search className="h-4 w-4" />
+            </Button>
+        </form>
+    </div>
+  )
+}
 
-export default SearchByUrlBar;
+export default SearchByUrlBar

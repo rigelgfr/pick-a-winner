@@ -1,7 +1,7 @@
 // components/CommentFetcher.tsx
 "use client";
 
-import React, { useState, useCallback, forwardRef, useImperativeHandle } from 'react';
+import { useState, forwardRef, useImperativeHandle } from 'react';
 
 // Interface for the structure of a single comment expected from the API
 export interface Comment {
@@ -12,16 +12,11 @@ export interface Comment {
     profile_picture_url?: string;
 }
 
-// Interface for pagination cursors from the API
-interface PagingCursors {
-    after?: string;
-}
-
 // Props the component receives from its parent (PickerUI)
 interface CommentFetcherProps {
     mediaId: string | null; // The ID of the post to fetch comments for (or null if none selected)
     onError: (error: string | null) => void; // Callback function to report errors to the parent
-    onPageFetched?: (fetchedCount: number, firstCommenter?: { username: string; profile_picture_url?: string }) => void; // Optional callback for progress/animation
+    onPageFetched?: (fetchedCount: number) => void; // Simplified callback for progress
 }
 
 // Defines the methods that the parent component can call via the ref
@@ -104,14 +99,8 @@ const CommentFetcher = forwardRef<CommentFetcherRef, CommentFetcherProps>(
                         console.log(`Page ${pagesFetched}: Fetched ${newComments.length} comments. Total: ${accumulatedComments.length}. HasNext: ${hasNextPage}`);
 
                         // --- Call Progress Callback (if provided) ---
-                        if (onPageFetched && newComments.length > 0) {
-                            onPageFetched(
-                                accumulatedComments.length,
-                                {
-                                    username: newComments[0].username,
-                                    profile_picture_url: newComments[0].profile_picture_url
-                                }
-                            );
+                        if (onPageFetched) {
+                            onPageFetched(accumulatedComments.length);
                         }
                         // --- End Progress Callback ---
 
@@ -142,13 +131,8 @@ const CommentFetcher = forwardRef<CommentFetcherRef, CommentFetcherProps>(
             }
         })); // End useImperativeHandle
 
-        // --- Component Rendering ---
-        // This component itself doesn't need to render anything visible.
-        // Its purpose is to provide the fetchAllComments function via the ref.
-        // You could render a status indicator for debugging if needed.
-        // if (internalIsLoadingPage) { console.log("CommentFetcher is loading a page..."); }
+        // This component doesn't render anything visible
         return null;
-        // --- End Component Rendering ---
     }
 );
 
