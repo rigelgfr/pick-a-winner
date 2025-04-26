@@ -13,8 +13,8 @@ interface RulesFormProps {
 }
 
 const RulesForm: React.FC<RulesFormProps> = ({ rules, onChange, disabled = false }) => {
-  const handleChange = (field: keyof CommentRules, value: any) => {
-    onChange({
+    const handleChange = <T extends number | boolean>(field: keyof CommentRules, value: T) => {
+        onChange({
       ...rules,
       [field]: value,
     })

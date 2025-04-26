@@ -12,7 +12,7 @@ function extractShortcode(url: string): string | null {
         // Match /p/SHORTCODE/ or /reel/SHORTCODE/ or /tv/SHORTCODE/
         const match = parsedUrl.pathname.match(/^\/(?:p|reel|tv)\/([a-zA-Z0-9_-]+)/);
         return match ? match[1] : null;
-    } catch (e) {
+    } catch {
         return null; // Invalid URL
     }
 }
@@ -112,7 +112,7 @@ export async function GET(request: NextRequest) {
 
     try {
         // --- Search ONLY owned media ---
-        let foundPost = await searchEndpointForShortcode(userId!, token!, targetShortcode!);
+        const foundPost = await searchEndpointForShortcode(userId!, token!, targetShortcode!);
 
         // --- Return result ---
         if (foundPost) {

@@ -216,7 +216,7 @@ export const WinnerDisplay: React.FC<{
 
             <CardContent>
               <blockquote className="italic bg-accent p-3 rounded-md text-sm">
-                "{winner.text || "[No comment text available]"}"
+                <span>&quot;{winner.text || '[No comment text available]'}&quot;</span>
               </blockquote>
             </CardContent>
 
