@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
   const error = url.searchParams.get('error');
   const errorDescription = url.searchParams.get('error_description');
   const receivedState = url.searchParams.get('state'); // Get state from query params
-  const redirectBaseUrl = new URL('/picker', url.origin);
+  const redirectBaseUrl = new URL('/', url.origin);
 
   // --- Get the state cookie ---
   const cookieStore = await cookies(); // Get cookie store instance
@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
   // --- State Validation ---
   if (!receivedState || !expectedState || receivedState !== expectedState) {
     console.error('Invalid OAuth state received.', { received: receivedState, expected: expectedState });
-    const redirectUrl = new URL('/picker', request.nextUrl.origin);
+    const redirectUrl = new URL('/', request.nextUrl.origin);
     redirectUrl.searchParams.set('error', 'Invalid login attempt (state mismatch). Please try again.');
     return NextResponse.redirect(redirectUrl.toString()); // Redirect with error
   }
@@ -166,7 +166,7 @@ export async function GET(request: NextRequest) {
 
         console.log('Instagram Login successful. Token stored in session.');
 
-        const redirectUrl = new URL('/picker', request.nextUrl.origin); // Use the origin the request came from (the ngrok URL)
+        const redirectUrl = new URL('/', request.nextUrl.origin); // Use the origin the request came from (the ngrok URL)
 
         const response = NextResponse.json({ success: true });
         response.headers.set('Location', redirectUrl.toString()); // Redirect to /picker on the SAME domain (ngrok)
@@ -180,7 +180,7 @@ export async function GET(request: NextRequest) {
       if (error instanceof Error) { errorMessage = error.message; }
 
       // Construct error redirect URL based on the origin
-      const errorRedirectUrl = new URL('/picker', request.nextUrl.origin);
+      const errorRedirectUrl = new URL('/', request.nextUrl.origin);
       errorRedirectUrl.searchParams.set('error', errorMessage);
 
       // Use the modified redirect approach for errors
