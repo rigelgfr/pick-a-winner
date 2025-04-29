@@ -17,7 +17,7 @@ export const faqItems = [
     },
     {
       question: "How are winners selected?",
-      answer: "Winners are selected randomly from all valid comments based on the rules you set. You can require comments to include specific hashtags, mentions, or keywords. The selection process is transparent and can be recorded for sharing with your audience."
+      answer: "Winners are selected randomly from all valid comments based on the rules you set. The selection process is transparent and can be recorded for sharing with your audience."
     },
     {
       question: "Is my Instagram data safe?",
