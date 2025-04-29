@@ -2,79 +2,74 @@
 import { NextResponse } from 'next/server';
 import { getIronSession, type IronSessionData } from 'iron-session';
 import { cookies } from 'next/headers';
-import { sessionOptions, type UserProfile } from '@/lib/session'; // Import UserProfile
-
-// Define the expected structure from the Graph API /me endpoint
-interface InstagramMeResponse {
-    id: string;
-    username: string;
-    profile_picture_url?: string; // This is the field we need
-    name?: string; // Added
-    biography?: string; // Added
-    media_count?: number; // Added
-    followers_count?: number; // Added
-    follows_count?: number; // Added
-    error?: { message: string };
-}
+import { sessionOptions, type UserProfile } from '@/lib/session';
 
 export async function GET() {
     console.log("API Route /api/auth/session: Checking session...");
     try {
         const session = await getIronSession<IronSessionData>(await cookies(), sessionOptions);
-        const { ig_access_token, ig_user_id } = session;
+        const { ig_access_token, ig_user_id, ig_username, ig_profile_picture } = session;
 
         if (!ig_access_token || !ig_user_id) {
             console.log("API Route /api/auth/session: No token/ID found in session.");
             return NextResponse.json({ isLoggedIn: false, user: null });
         }
 
-        console.log("API Route /api/auth/session: Token/ID found, fetching profile from IG...");
+        // Use the profile data that's already stored in the session
+        if (ig_username) {
+            console.log("API Route /api/auth/session: Using cached profile data for", ig_username);
+            
+            const userProfile: UserProfile = {
+                id: ig_user_id,
+                username: ig_username,
+                profile_picture_url: ig_profile_picture,
+            };
 
-        // --- Fetch user profile from Instagram Graph API ---
+            return NextResponse.json({ isLoggedIn: true, user: userProfile });
+        }
+
+        // Fallback: If for some reason we don't have profile data cached
+        // (shouldn't happen with the new implementation)
+        console.log("API Route /api/auth/session: No cached profile data, fetching from IG...");
+        
         try {
-            const fields = 'id,username,profile_picture_url,name,biography,media_count,followers_count,follows_count'; // Ensure profile_picture_url is requested
+            const fields = 'id,username,profile_picture_url';
             const userApiUrl = `https://graph.instagram.com/me?fields=${fields}&access_token=${ig_access_token}`;
 
-            const userResponse = await fetch(userApiUrl, { cache: 'no-store' }); // Don't cache heavily
+            const userResponse = await fetch(userApiUrl, { cache: 'no-store' });
 
             if (!userResponse.ok) {
-                 // Attempt to parse error from Instagram
-                 const errorBody = await userResponse.text();
-                 let errorMessage = `Instagram API error (Status: ${userResponse.status})`;
-                 try {
-                     const errorJson = JSON.parse(errorBody);
-                     errorMessage = errorJson?.error?.message || errorMessage;
-                 } catch { /* Ignore parsing error, use default message */ }
+                const errorBody = await userResponse.text();
+                let errorMessage = `Instagram API error (Status: ${userResponse.status})`;
+                try {
+                    const errorJson = JSON.parse(errorBody);
+                    errorMessage = errorJson?.error?.message || errorMessage;
+                } catch { /* Ignore parsing error */ }
 
-                 console.error(`API Route /api/auth/session: Failed to fetch IG profile. ${errorMessage}`, errorBody);
-                 // If fetching fails (e.g., token expired), treat user as logged out
-                 // Optionally: Destroy session here? No, cannot modify cookies easily in GET.
-                 return NextResponse.json({ isLoggedIn: false, user: null });
+                console.error(`API Route /api/auth/session: Failed to fetch IG profile. ${errorMessage}`, errorBody);
+                return NextResponse.json({ isLoggedIn: false, user: null });
             }
 
-            const userData: InstagramMeResponse = await userResponse.json();
+            const userData = await userResponse.json();
             console.log("API Route /api/auth/session: Successfully fetched IG profile for", userData.username);
 
-            // Prepare the user profile object to return
+            // Store this for future use (to avoid redundant calls)
+            session.ig_username = userData.username;
+            session.ig_profile_picture = userData.profile_picture_url;
+            await session.save();
+
             const userProfile: UserProfile = {
-                id: String(userData.id), // Use the ID from /me
+                id: String(userData.id),
                 username: userData.username,
                 profile_picture_url: userData.profile_picture_url,
-                name: userData.name,
-                biography: userData.biography,
-                media_count: userData.media_count,
-                followers_count: userData.followers_count,
-                follows_count: userData.follows_count,
             };
 
             return NextResponse.json({ isLoggedIn: true, user: userProfile });
 
         } catch (fetchError) {
             console.error("API Route /api/auth/session: Network/fetch error getting IG profile:", fetchError);
-            // Network error, treat as logged out for safety
-             return NextResponse.json({ isLoggedIn: false, user: null });
+            return NextResponse.json({ isLoggedIn: false, user: null });
         }
-        // --- End Fetch user profile ---
 
     } catch (error) {
         console.error("API Route /api/auth/session: Error accessing session:", error);

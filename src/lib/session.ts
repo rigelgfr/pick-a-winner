@@ -5,8 +5,8 @@ declare module 'iron-session' {
   interface IronSessionData {
     ig_access_token?: string;
     ig_user_id?: string;
-    // Add any other session data you might need here
-  }
+    ig_username?: string;
+    ig_profile_picture?: string;  }
 }
 
 // Ensure SESSION_SECRET is set in .env.local and is at least 32 characters long

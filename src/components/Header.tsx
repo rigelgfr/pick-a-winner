@@ -20,7 +20,7 @@ import {
 // Update SessionState to expect the full UserProfile or null
 interface SessionState {
     isLoggedIn: boolean;
-    user: UserProfile | null; // Expect the full profile if logged in
+    user: UserProfile | null;
 }
 
 export function Header() {
@@ -36,15 +36,13 @@ export function Header() {
             setIsLoading(true);
             try {
                 const response = await fetch('/api/auth/session');
-                // Removed previous error handling here, relying on API response structure
-                 if (!response.ok) {
-                     // Handle non-200 responses if needed, but API should return structured data
-                     console.error("Header fetch: API route returned non-OK status", response.status);
-                      setSessionState({ isLoggedIn: false, user: null });
-                 } else {
+                if (!response.ok) {
+                    console.error("Header fetch: API route returned non-OK status", response.status);
+                    setSessionState({ isLoggedIn: false, user: null });
+                } else {
                     const data: SessionState = await response.json();
                     setSessionState(data);
-                 }
+                }
             } catch (error) {
                 console.error('Error fetching session status in header:', error);
                 setSessionState({ isLoggedIn: false, user: null });
