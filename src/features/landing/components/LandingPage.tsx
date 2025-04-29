@@ -19,7 +19,7 @@ const LandingPage: React.FC = () => {
                 href="/about"
                 className="text-sm text-primary underline underline-offset-4 hover:text-primary/80 transition-colors"
               >
-                Learn how to set up your Facebook and Instagram accounts to use this app
+                Learn more about pickAwinner and if you are eligible to use it
               </Link>
             </div>
     
